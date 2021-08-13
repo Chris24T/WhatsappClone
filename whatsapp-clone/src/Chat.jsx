@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Avatar, IconButton } from "@material-ui/core";
 import "./Chat.css";
+import { useParams } from "react-router-dom";
 import {
   AttachFile,
   InsertEmoticon,
@@ -11,7 +12,8 @@ import {
 } from "@material-ui/icons";
 
 function Chat() {
-  const [chatInput, setChatInput] = useState(false); //bool - input exists or not
+  const [chatInput, setChatInput] = useState(false); //bool - input exists or not (should change to the value of the input)
+  const { roomId } = useParams(); // as oppsed to passing as prop
 
   useEffect(() => {
     const chatInputField = document.getElementById("chat__input");
@@ -53,9 +55,6 @@ function Chat() {
           <IconButton>
             <SearchOutlined />
           </IconButton>
-          {/* <IconButton>
-                <AttachFile/>
-            </IconButton> */}
           <IconButton>
             <MoreVert />
           </IconButton>

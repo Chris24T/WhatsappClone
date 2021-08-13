@@ -5,8 +5,8 @@ import {
   Chat as ChatIcon,
   MoreVert as MoreVertIcon,
   SearchOutlined,
-  SettingsPowerSharp,
 } from "@material-ui/icons";
+
 import SidebarChat from "./SidebarChat";
 import db from "./firebase";
 
@@ -17,7 +17,7 @@ function Sidebar() {
 
   useEffect(() => {
     // db change listerner - updates rooms on snapshot change
-    db.collection("rooms").onSnapshot((snapshot) => {
+    const unsubscribe = db.collection("rooms").onSnapshot((snapshot) => {
       setRooms(
         snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -25,7 +25,9 @@ function Sidebar() {
         }))
       );
     });
-    return () => {};
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -56,9 +58,6 @@ function Sidebar() {
         {rooms.map((room) => (
           <SidebarChat key={room.id} id={room.id} name={room.data.name} />
         ))}
-        {/* <SidebarChat addNewChat />
-        <SidebarChat />
-        <SidebarChat /> */}
       </div>
     </div>
   );

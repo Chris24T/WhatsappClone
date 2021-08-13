@@ -1,0 +1,38 @@
+.login__container {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  flex: 1;
+  border-radius: 10px;
+  padding: 100px;
+  text-align: center;
+  background-color: #fff;
+}
+
+.login {
+  display: grid;
+  place-items: center;
+
+  height: 80%;
+  width: 80%;
+}
+
+.login__buttonContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.login__buttonContainer > button {
+  color: lightgray;
+  margin-bottom: 10px;
+
+  /* border: 1px solid black; */
+}
+
+.login__text {
+  margin-bottom: 25px;
+}
+
+.login__container > img {
+  object-fit: contain;
+  height: 100px;
+  margin-bottom: 40px;
+}
