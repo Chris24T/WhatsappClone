@@ -4,17 +4,8 @@ import { Avatar } from "@material-ui/core";
 import "./SidebarChat.css";
 import db from "./firebase";
 
-function SidebarChat({ addNewChat, id, name }) {
+function SidebarChat({ addNewChat, id, name, content }) {
   const [seed, setSeed] = useState("");
-
-  useEffect(() => {
-    // effect
-    setSeed(Math.floor(Math.random() * 5000));
-
-    return () => {
-      // cleanup
-    };
-  }, []);
 
   function createChat() {
     const roomName = prompt("Name the Chat Group");

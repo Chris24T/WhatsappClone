@@ -10,9 +10,11 @@ import {
   SearchOutlined,
   Send,
 } from "@material-ui/icons";
+import db from "./firebase";
 
 function Chat() {
   const [chatInput, setChatInput] = useState(false); //bool - input exists or not (should change to the value of the input)
+  const [chatContent, setChatContent] = useState([]);
   const { roomId } = useParams(); // as oppsed to passing as prop
 
   useEffect(() => {
@@ -25,6 +27,22 @@ function Chat() {
       chatInputField.removeEventListener("input", handleChatInputChange);
     };
   }, []);
+
+  useEffect(() => {
+    //query "rooms" collection by roomid to get subcollection "messages"
+    if (roomId) {
+      db.collection("rooms")
+        .doc(roomId)
+        .collection("messages")
+        .orderBy("timestamp", "asc")
+        .onSnapshot((snapshot) => {
+          //an array of "messages" objects (with metadata)
+          setChatContent(snapshot.docs.map((doc) => doc.data()));
+          console.log(snapshot.docs[0].data());
+          console.log(roomId);
+        });
+    }
+  }, [roomId]);
 
   function handleChatInputChange(inputFieldValue) {
     console.log("chat__input : value change");

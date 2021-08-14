@@ -15,19 +15,42 @@ import "./Sidebar.css";
 function Sidebar() {
   const [rooms, setRooms] = useState([]);
 
+  // useEffect(() => {
+  //   // db change listerner - updates rooms on snapshot change
+  //   const unsubscribe = db.collection("rooms").onSnapshot((snapshot) => {
+  //     setRooms(
+  //       snapshot.docs.map((doc) => ({
+  //         id: doc.id,
+  //         data: doc.data(),
+  //       }))
+  //     );
+  //   });
+  //   return () => {
+  //     unsubscribe();
+  //   };
+  // }, []);
+
   useEffect(() => {
-    // db change listerner - updates rooms on snapshot change
-    const unsubscribe = db.collection("rooms").onSnapshot((snapshot) => {
+    const roomref = db.collection("rooms");
+    const query = roomref.where("users", "array-contains", "AUserId");
+
+    query.onSnapshot((snapshot) => {
+      // console.dir(snapshot);
+      // console.dir(snapshot.docs);
+      // console.dir(snapshot.docs[0]);
+      //console.dir(snapshot.docs[0].data());
+
       setRooms(
         snapshot.docs.map((doc) => ({
           id: doc.id,
           data: doc.data(),
         }))
       );
+      // will need to call api again to get sub collections of the above
+      // -> can only get 1 collection at a time
+      // + its fields( not its subsollections )
+      // -> therefore must query api again to get them
     });
-    return () => {
-      unsubscribe();
-    };
   }, []);
 
   return (
@@ -56,7 +79,12 @@ function Sidebar() {
       <div className="sidebar__chats">
         <SidebarChat addNewChat />
         {rooms.map((room) => (
-          <SidebarChat key={room.id} id={room.id} name={room.data.name} />
+          <SidebarChat
+            key={room.id}
+            id={room.id}
+            content={room.content}
+            name={room.data.name}
+          />
         ))}
       </div>
     </div>
