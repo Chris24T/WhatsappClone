@@ -17,11 +17,15 @@ function App() {
   return (
     <div className="app">
       <UserContext.Provider value={{ user, setUser }}>
-        {!user ? (
-          <Login />
-        ) : (
-          <div className="app__body">
-            <Router>
+        <Router>
+          {!user ? (
+            <React.Fragment>
+              {/* Redirect for sake of persistent URL -> it showed the last room id when logging in */}
+              <Redirect to="/" />
+              <Login /> {/*couldve just sent "setUser" as a prop here*/}
+            </React.Fragment>
+          ) : (
+            <div className="app__body">
               <Sidebar />
               <Switch>
                 <Route path="/room/:roomId">
@@ -36,9 +40,9 @@ function App() {
                   {console.log("Default Match")}
                 </Route>
               </Switch>
-            </Router>
-          </div>
-        )}
+            </div>
+          )}
+        </Router>
       </UserContext.Provider>
     </div>
   );

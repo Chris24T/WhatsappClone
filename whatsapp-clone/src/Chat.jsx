@@ -38,8 +38,8 @@ function Chat() {
         .onSnapshot((snapshot) => {
           //an array of "messages" objects (with metadata)
           setChatContent(snapshot.docs.map((doc) => doc.data()));
-          console.log(snapshot.docs[0].data());
-          console.log(roomId);
+          // console.log(snapshot.docs[0].data());
+          // console.log(roomId);
         });
     }
   }, [roomId]);
@@ -66,7 +66,7 @@ function Chat() {
       <div className="chat__header">
         <Avatar /> {/*Avatar should be taken from context api db */}
         <div className="chat__headerInfo">
-          <h3>Room Name</h3>
+          <h3>Room Name - {roomId} </h3>
           <p>Last seen at</p>
         </div>
         <div className="chat__headerRight">
