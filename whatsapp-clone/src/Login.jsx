@@ -14,6 +14,7 @@ function Login() {
     auth
       .signInWithPopup(provider)
       .then((result) => {
+        result.userId = result.additionalUserInfo.profile.id;
         setUser(result);
       })
       .catch((e) => {

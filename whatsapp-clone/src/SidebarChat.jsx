@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { Avatar } from "@material-ui/core";
 import "./SidebarChat.css";
 import db from "./firebase";
+import UserContext from "./contexts/userContext";
 
 function SidebarChat({ addNewChat, id, name, content }) {
   const [seed, setSeed] = useState("");
-
+  const { user, setUser } = useContext(UserContext);
+  console.log("yser", user);
   function createChat() {
     const roomName = prompt("Name the Chat Group");
 
@@ -14,6 +16,7 @@ function SidebarChat({ addNewChat, id, name, content }) {
       //db action
       db.collection("rooms").add({
         name: roomName,
+        users: [user.userId],
       });
     }
   }

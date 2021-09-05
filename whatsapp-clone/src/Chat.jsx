@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Avatar, IconButton } from "@material-ui/core";
+
 import "./Chat.css";
 import { useParams } from "react-router-dom";
 import {
@@ -10,11 +11,15 @@ import {
   SearchOutlined,
   Send,
 } from "@material-ui/icons";
-import db from "./firebase";
+import db, { timeStamp } from "./firebase";
+import UserContext from "./contexts/userContext";
+import MessageOptions from "./MessageOptions.jsx";
 
 function Chat() {
   const [chatInput, setChatInput] = useState(false); //bool - input exists or not (should change to the value of the input)
   const [chatContent, setChatContent] = useState([]);
+  const [roomInfo, setRoomInfo] = useState({});
+  const { user, setUser } = useContext(UserContext);
   const { roomId } = useParams(); // as oppsed to passing as prop
 
   useEffect(() => {
@@ -31,21 +36,44 @@ function Chat() {
   useEffect(() => {
     //query "rooms" collection by roomid to get subcollection "messages"
     if (roomId) {
-      db.collection("rooms")
+      // Queuing "room" (meta) info listener
+      //-> ~duplicate api request as in "sidebar"
+      const unSubRoomInfo = db
+        .collection("rooms")
+        .doc(roomId)
+        .onSnapshot((snapshotDoc) => {
+          const data = snapshotDoc.data();
+          setRoomInfo({
+            id: roomId,
+            ...data,
+          });
+        });
+
+      // Queuing room "messages" listener
+      const unSubMessages = db
+        .collection("rooms")
         .doc(roomId)
         .collection("messages")
         .orderBy("timestamp", "asc")
         .onSnapshot((snapshot) => {
           //an array of "messages" objects (with metadata)
-          setChatContent(snapshot.docs.map((doc) => doc.data()));
+          setChatContent(
+            snapshot.docs.map((doc) => {
+              return { id: doc.id, data: doc.data() };
+            })
+          );
           // console.log(snapshot.docs[0].data());
           // console.log(roomId);
         });
+      return () => {
+        unSubMessages();
+        unSubRoomInfo();
+      };
     }
-  }, [roomId]);
+  }, [roomId]); //dependency not strictly nessecary here
 
   function handleChatInputChange(inputFieldValue) {
-    console.log("chat__input : value change");
+    //console.log("chat__input : value change");
     if (inputFieldValue) {
       setChatInput(true);
     } else {
@@ -58,7 +86,13 @@ function Chat() {
     const msg = document.forms["chatInputForm"]["chatInput"].value;
     document.forms["chatInputForm"]["chatInput"].value = "";
     console.log("sending >>>", msg);
-    setChatInput();
+    if (!msg) return;
+    db.collection("rooms").doc(roomId).collection("messages").add({
+      content: msg,
+      owner: user.userId,
+      timestamp: timeStamp(),
+    });
+    setChatInput(false);
   }
 
   return (
@@ -66,7 +100,7 @@ function Chat() {
       <div className="chat__header">
         <Avatar /> {/*Avatar should be taken from context api db */}
         <div className="chat__headerInfo">
-          <h3>Room Name - {roomId} </h3>
+          <h3>{roomInfo.name}</h3>
           <p>Last seen at</p>
         </div>
         <div className="chat__headerRight">
@@ -78,15 +112,29 @@ function Chat() {
           </IconButton>
         </div>
       </div>
-
       <div className="chat__body">
-        <p className={`chat__message ${true && "chat__reciever"}`}>
-          <span className="chat__name ">Chris</span>
-          Hello
-          <span className="chat__timestamp">12:12pm</span>
-        </p>
+        {chatContent.map(({ id: messageId, data }) => {
+          return (
+            <div
+              className={`chat__message ${
+                data.owner === user.userId && "chat__reciever"
+              }`}
+              key={data.content}
+            >
+              <p>
+                <span className="chat__name ">{data.owner}</span>
+                {data.content}
+                <span className="chat__timestamp">
+                  {new Date(data.timestamp?.toDate()).toUTCString()}
+                </span>
+              </p>
+              <div className="chat__options--hide">
+                <MessageOptions idRing={{ messageId, roomId }} />
+              </div>
+            </div>
+          );
+        })}
       </div>
-
       <div className="chat__footer">
         <IconButton>
           <InsertEmoticon />

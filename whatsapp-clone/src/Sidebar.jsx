@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Avatar, IconButton } from "@material-ui/core";
 import {
   DonutLarge as DonutLargeIcon,
@@ -11,10 +11,11 @@ import SidebarChat from "./SidebarChat";
 import db from "./firebase";
 
 import "./Sidebar.css";
+import UserContext from "./contexts/userContext";
 
 function Sidebar() {
   const [rooms, setRooms] = useState([]);
-
+  const { user, setUser } = useContext(UserContext);
   // useEffect(() => {
   //   // db change listerner - updates rooms on snapshot change
   //   const unsubscribe = db.collection("rooms").onSnapshot((snapshot) => {
@@ -32,7 +33,7 @@ function Sidebar() {
 
   useEffect(() => {
     const roomref = db.collection("rooms");
-    const query = roomref.where("users", "array-contains", "AUserId");
+    const query = roomref.where("users", "array-contains", user.userId);
 
     query.onSnapshot((snapshot) => {
       // console.dir(snapshot);

@@ -51,6 +51,22 @@
   margin-bottom: 30px;
 }
 
+.chat__options--hide {
+  visibility: hidden;
+  position: absolute;
+  right: -10px;
+}
+
+.chat__message:hover > .chat__options--hide {
+  position: absolute;
+  visibility: visible;
+  cursor: pointer;
+  right: 0;
+  top: -5px;
+  color: red;
+  transition: right 0.25s;
+}
+
 .chat__name {
   position: absolute;
   top: -15px;
