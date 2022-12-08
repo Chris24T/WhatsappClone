@@ -1,3 +1,2 @@
 # whatsappClone
-a whatsapp clone
-TEST EDIT TEST
+a whatsapp clone built using React and firebase
